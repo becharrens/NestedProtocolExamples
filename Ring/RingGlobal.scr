@@ -1,0 +1,18 @@
+nested protocol Forward(role S, role E; new role RingNode) {
+  msg(int) from S to RingNode;
+  choice at RingNode {
+    RingNode calls Forward(RingNode, E);
+  } or {
+    msg(int) from RingNode to E;
+  }
+}
+
+global protocol Ring(role Start, role End) {
+  choice at Start {
+    Start calls Forward(Start, End)
+  } or {
+    msg(int) from Start to End;
+  }
+  msg(int) from End to Start;
+
+}

@@ -1,0 +1,51 @@
+local protocol Fannkuch_Main(self Main, role Worker) {
+    Task(int) to Worker;
+
+    choice at Worker {
+        accept Source from Worker in FannkuchRecursive(self, Worker; new NewWorker);
+        Result(int) from Worker;
+    } or {
+        Result(int) from Worker;
+    }
+}
+
+local protocol Fannkuch_Worker(role Main, self Worker) {
+    Task(int) from Main;
+
+    choice at Worker {
+        invite(Main as Source, self as Worker)
+        create(role NewWorker)
+        accept Worker from self in FannkuchRecursive(Main, self; new NewWorker);
+        Result(int) to Main;
+    } or {
+        Result(int) to Main;
+    }
+}
+
+
+
+local protocol FannkuchRecursive_Source(self Source, role Worker, role NewWorker) {
+    choice at NewWorker {
+        accept Source from NewWorker in FannkuchRecursive(self, NewWorker; new NewWorker);
+        Result(int) from NewWorker;
+    } or {
+        Result(int) from NewWorker;
+    }
+}
+
+local protocol FannkuchRecursive_Worker(role Source, self Worker, role NewWorker) {
+    Task(int) to NewWorker;
+}
+
+local protocol FannkuchRecursive_NewWorker(role Source, role Worker, self NewWorker) {
+    Task(int) from Worker;
+
+    choice at self {
+        invite(Main as Source, self as Worker)
+        create(role NewWorker)
+        accept Worker from self in FannkuchRecursive(self, NewWorker; new NewWorker);
+        Result(int) to Source;
+    } or {
+        Result(int) to Source;
+    }
+}

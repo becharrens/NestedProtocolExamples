@@ -1,0 +1,43 @@
+local protocol Ring_Start(self Start, role End) {
+  choice at Start {
+    invite(self as S, End as E) in Forward;
+    create(role RingNode) in Forward;
+    accept S from self in Forward_S(self, E; new RingNode);
+  } or {
+    msg(int) to End;
+  }
+  msg(int) from End;
+}
+
+local protocol Ring_End(role Start, self End) {
+  choice at Start {
+    accept End from Start in Forward(Start, self; new RingNode);
+  } or {
+    msg(int) from Start;
+  }
+  msg(int) to Start;
+}
+
+local protocol Forward_S(self S, role E, role RingNode) {
+  msg(int) to RingNode;
+}
+
+local protocol Forward_E(role S, self E, role RingNode) {
+  choice at RingNode {
+    accept E from RingNode in Forward(S, self; new RingNode);
+  } or {
+    msg(int) from RingNode;
+  }
+}
+
+local protocol Forward_RingNode(role S, role E, self RingNode) {
+  msg(int) from S;
+  choice at RingNode {
+    invite(self as S, E as E) in Forward;
+    create(role RingNode) in Forward;
+    accept S from self in Forward(self, E; new RingNode);
+  } or {
+    msg(int) from RingNode;
+  }
+}
+
