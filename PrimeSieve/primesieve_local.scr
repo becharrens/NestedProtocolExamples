@@ -1,0 +1,76 @@
+local protocol PrimeSieve_Master(self Master, role Worker) {
+    FirstPrime(int) to Worker;
+    UBound(int) to Worker;
+    choice at Worker {
+        Prime(int) from Worker;
+        accept M from Worker in Sieve_M(self, Worker; new W2);
+    } or {
+        Finish() from Worker;
+    }
+}
+
+local protocol PrimeSieve_Worker(role Master, self Worker) {
+    FirstPrime(int) from Master;
+    UBound(int) from Master;
+    choice at self {
+        Prime(int) to Master;
+        invite(Master as M, self as W1) in Sieve;
+        create(role W2) in Sieve;
+        accept W1 from self in Sieve_W1(Master, self; new W2);
+    } or {
+        Finish() to Master;
+    }
+}
+
+local protocol Sieve_M(self M, role W1, role W2) {
+    choice at W2 {
+        Prime(int) from W2;
+        accept M from W2 in Sieve_M(self, W2; new W2);
+    } or {
+        Finish() from W2;
+    }
+}
+
+local protocol Sieve_W1(role M, self W1, role W2) {
+    FilterPrime(int) to W2;
+
+    invite(self as S, W2 as R) in Sieve_SendNums;
+    // create not needed without dynamic participants
+    accept S from self in Sieve_SendNums_S(self, W2);
+}
+
+local protocol Sieve_W2(role M, role W1, self W2) {
+    FilterPrime(int) from W1;
+    accept R from W1 in Sieve_SendNums_R(W1, self);
+
+    choice at W2 {
+        Prime(int) to M;
+        invite(M as M, self as W1) in Sieve;
+        create(role W2) in Sieve;
+        accept W1 from self in Sieve_W1(M, self; new W2);
+    } or {
+        Finish() to M;
+    }
+}
+
+local protocol Sieve_SendNums_S(self S, role R) {
+    rec SEND {
+        choice at self {
+            Num(int) to R;
+            continue SEND;
+        } or {
+            End() to R;
+        }
+    }
+}
+
+local protocol Sieve_SendNums_R(role S, self R) {
+    rec SEND {
+        choice at S {
+            Num(int) from S;
+            continue SEND;
+        } or {
+            End() from S;
+        }
+    }
+}

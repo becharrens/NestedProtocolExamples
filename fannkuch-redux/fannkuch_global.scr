@@ -17,20 +17,3 @@ global protocol Fannkuch(role Main, role Worker) {
         Result(int) from Worker to Main;
     }
 }
-
----
-
-
-global protocol Fannkuch(role Main) {
-    Main calls FannkuchRecursive(Main as Source)
-}
-
-nested protocol FannkuchRecursive(role Source; new role Worker) {
-    Task(int) from Source to Worker;
-    choice at NewWorker {
-        NewWorker calls FannkuchRecursive(Source, NewWorker);
-        Result(int) from NewWorker to Source;
-    } or {
-        Result(int) from NewWorker to Source;
-    }
-}

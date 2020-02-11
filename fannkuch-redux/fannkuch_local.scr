@@ -41,7 +41,7 @@ local protocol FannkuchRecursive_NewWorker(role Source, role Worker, self NewWor
     Task(int) from Worker;
 
     choice at self {
-        invite(Main as Source, self as Worker)
+        invite(Source as Source, self as Worker)
         create(role NewWorker)
         accept Worker from self in FannkuchRecursive(self, NewWorker; new NewWorker);
         Result(int) to Source;

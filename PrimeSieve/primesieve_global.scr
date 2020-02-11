@@ -1,0 +1,36 @@
+global protocol PrimeSieve(role Master, role Worker) {
+    FirstPrime(int) from Master to Worker;
+    UBound(int) from Master to Worker;
+    choice at Worker {
+        Prime(int) from Worker to Master;
+        Worker calls Sieve(Master, Worker);
+    } or {
+        Finish() from Worker to Master;
+    }
+}
+
+nested protocol Sieve(role M, role W1; new role W2) {
+
+    nested protocol SendNums(role S, role R) {
+        rec SEND {
+            choice at S {
+                Num(int) from S to R;
+                continue SEND;
+            } or {
+                End() from S to R;
+            }
+        }
+    }
+
+    FilterPrime(int) from W1 to W2;
+    W1 calls SendNums(W1, W2);
+
+    choice at W2 {
+        Prime(int) from W2 to M;
+        W2 calls Sieve(M, W2);
+    } or {
+        Finish() from W2 to M;
+    }
+
+}
+

@@ -1,12 +1,13 @@
 package main
 
-import "CodeGenTest/fannkuch-redux/protocol"
+import "CodeGenTest/PrimeSieve/protocol"
 
 func main() {
 	// protocol.CMS()
 	// protocol.Ring()
 	// Fannkuch_redux.Pfannkuch()
-	for {
-		protocol.Fannkuch()
-	}
+	// for {
+	// 	protocol.Fannkuch()
+	// }
+	protocol.PrimeSieve()
 }

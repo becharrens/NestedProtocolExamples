@@ -18,7 +18,7 @@ const N = 3
 func Fannkuch() {
 	rand.Seed(time.Now().Unix())
 
-	fmt.Print("Starting Ring protocol...\n\n")
+	fmt.Print("Starting Fannkuch protocol...\n\n")
 
 	mainWorkerTask := make(chan messages.Task)
 	mainWorkerResult1 := make(chan messages.Result)
@@ -51,5 +51,5 @@ func Fannkuch() {
 	go roles.StartFannkuchWorker(&wg, &workerChan, &inviteChan, workerEnv)
 
 	wg.Wait()
-	fmt.Println("\nRing Protocol Fininished...")
+	fmt.Println("\nFannkuch Protocol Fininished...")
 }
